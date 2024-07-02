@@ -66,11 +66,11 @@ const ValidateButton: React.FC<ValidateButtonProps> = ({ formData, setErrors, cl
       newErrors.secretKey = '비밀 액세스 키는 소문자와 숫자로만 구성되어야 합니다.';
     }
 
-    // 이메일 유효성 검사
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      isValid = false;
-      newErrors.email = '유효한 이메일 형식이 아닙니다.';
-    }
+    // // 이메일 유효성 검사
+    // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    //   isValid = false;
+    //   newErrors.email = '유효한 이메일 형식이 아닙니다.';
+    // }
 
     // API 엔드포인트 유효성 검사
     const apiEndpointPattern = /^https:\/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-public\.ke\.kr-central-2\.kakaocloud\.com$/;

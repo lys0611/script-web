@@ -147,7 +147,6 @@ echo "kakaocloud: 1.Starting environment variable setup"
 command=$(cat <<EOF
 export ACC_KEY='${accessKey}'
 export SEC_KEY='${secretKey}'
-export EMAIL_ADDRESS='${email}'
 export CLUSTER_NAME='${clusterName}'
 export API_SERVER='${apiEndpoint}'
 export AUTH_DATA='${authData}'
@@ -310,17 +309,17 @@ sudo -E ./script.sh`;
                     onChange={(e) => setSecretKey(e.target.value)}
                     error={errors.secretKey}
                 />
-                <InputBox
-                    label="3. 사용자 이메일"
-                    placeholder="직접 입력"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    error={errors.email}
-                />
+                {/*<InputBox*/}
+                {/*    label="3. 사용자 이메일"*/}
+                {/*    placeholder="직접 입력"*/}
+                {/*    value={email}*/}
+                {/*    onChange={(e) => setEmail(e.target.value)}*/}
+                {/*    error={errors.email}*/}
+                {/*/>*/}
             </GroupContainer>
             <GroupContainer>
                 <InputBox
-                    label="4. 프로젝트 이름"
+                    label="3. 프로젝트 이름"
                     placeholder="직접 입력"
                     value={projectName}
                     onChange={(e) => setProjectName(e.target.value)}
@@ -333,14 +332,14 @@ sudo -E ./script.sh`;
             </GroupContainer>
             <GroupContainer>
                 <SelectBox
-                    label="5. 클러스터 리스트"
+                    label="4. 클러스터 리스트"
                     value={clusterName}
                     options={clusterList}
                     onChange={handleClusterNameChange}
                     disabled={loadingButton === 'fetchClusters'}
                 />
                 <InputBox
-                    label="6. 클러스터 이름"
+                    label="5. 클러스터 이름"
                     placeholder="직접 입력"
                     value={clusterName}
                     onChange={(e) => setClusterName(e.target.value)}
@@ -351,7 +350,7 @@ sudo -E ./script.sh`;
                     error={errors.clusterName}
                 />
                 <InputBox
-                    label="7. 클러스터의 API 엔드포인트"
+                    label="6. 클러스터의 API 엔드포인트"
                     placeholder="직접 입력"
                     value={apiEndpoint}
                     onChange={(e) => setApiEndpoint(e.target.value)}
@@ -362,7 +361,7 @@ sudo -E ./script.sh`;
                     error={errors.apiEndpoint}
                 />
                 <InputBox
-                    label="8. 클러스터의 certificate-authority-data"
+                    label="7. 클러스터의 certificate-authority-data"
                     placeholder="직접 입력"
                     value={authData}
                     onChange={(e) => setAuthData(e.target.value)}
@@ -375,14 +374,14 @@ sudo -E ./script.sh`;
             </GroupContainer>
             <GroupContainer>
                 <SelectBox
-                    label="9. 인스턴스 그룹 리스트"
+                    label="8. 인스턴스 그룹 리스트"
                     value={instanceName}
                     options={instanceList.split(', ')}
                     onChange={handleInstanceNameChange}
                     disabled={loadingButton === 'fetchInstanceLists'}
                 />
                 <InputBox
-                    label="10. Primary의 엔드포인트"
+                    label="9. Primary의 엔드포인트"
                     placeholder="직접 입력"
                     value={primaryEndpoint}
                     onChange={(e) => setPrimaryEndpoint(e.target.value)}
@@ -393,7 +392,7 @@ sudo -E ./script.sh`;
                     error={errors.primaryEndpoint}
                 />
                 <InputBox
-                    label="11. Standby의 엔드포인트"
+                    label="10. Standby의 엔드포인트"
                     placeholder="직접 입력"
                     value={standbyEndpoint}
                     onChange={(e) => setStandbyEndpoint(e.target.value)}
@@ -406,14 +405,14 @@ sudo -E ./script.sh`;
             </GroupContainer>
             <GroupContainer>
                 <InputBox
-                    label="12. Docker Image 이름"
+                    label="11. Docker Image 이름"
                     placeholder="직접 입력"
                     value={dockerImageName}
                     onChange={(e) => setDockerImageName(e.target.value)}
                     error={errors.dockerImageName}
                 />
                 <InputBox
-                    label="13. Docker Image Base Java Version"
+                    label="12. Docker Image Base Java Version"
                     placeholder="직접 입력"
                     value={dockerJavaVersion}
                     onChange={(e) => setDockerJavaVersion(e.target.value)}
