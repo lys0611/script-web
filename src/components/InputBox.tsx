@@ -71,19 +71,19 @@ const ButtonContainer = styled.div`
 `;
 
 const InputBox: React.FC<InputBoxProps> = ({
-                                               label,
-                                               placeholder,
-                                               value,
-                                               onChange,
-                                               height,
-                                               showApiButton,
-                                               onApiClick,
-                                               onConsoleClick,
-                                               isLoading,
-                                               readOnly,
-                                               disableAll,
-                                               error
-                                           }) => {
+                                                label,
+                                                placeholder,
+                                                value,
+                                                onChange,
+                                                height,
+                                                showApiButton,
+                                                onApiClick,
+                                                onConsoleClick,
+                                                isLoading,
+                                                readOnly,
+                                                disableAll,
+                                                error
+                                            }) => {
     return (
         <Container>
             <LabelContainer>

@@ -122,9 +122,6 @@ const ValidateButton: React.FC<ValidateButtonProps> = ({ formData, setErrors, cl
       if (primaryParts.length < 6 || (primaryParts[0] !== 'az-a' && primaryParts[0] !== 'az-b')) {
         isValid = false;
         newErrors.primaryEndpoint = 'Primary 엔드포인트 형식이 유효하지 않습니다.';
-      } else if (primaryParts[1] !== 'db-les') {
-        isValid = false;
-        newErrors.primaryEndpoint = 'Primary 엔드포인트는 "db-les"로 시작해야 합니다.';
       } else if (!/^[0-9a-f]{32}$/.test(primaryParts[2])) {
         isValid = false;
         newErrors.primaryEndpoint = 'Primary 엔드포인트의 UUID 형식이 유효하지 않습니다.';
@@ -143,9 +140,6 @@ const ValidateButton: React.FC<ValidateButtonProps> = ({ formData, setErrors, cl
       if (standbyParts.length < 6 || (standbyParts[0] !== 'az-a' && standbyParts[0] !== 'az-b')) {
         isValid = false;
         newErrors.standbyEndpoint = 'Standby 엔드포인트 형식이 유효하지 않습니다.';
-      } else if (standbyParts[1] !== 'db-les') {
-        isValid = false;
-        newErrors.standbyEndpoint = 'Standby 엔드포인트는 "db-les"로 시작해야 합니다.';
       } else if (!/^[0-9a-f]{32}$/.test(standbyParts[2])) {
         isValid = false;
         newErrors.standbyEndpoint = 'Standby 엔드포인트의 UUID 형식이 유효하지 않습니다.';
