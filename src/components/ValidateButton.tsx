@@ -1,3 +1,4 @@
+// src/components/ValidateButton.tsx
 import React from 'react';
 import styled from 'styled-components';
 
@@ -135,6 +136,8 @@ const ValidateButton: React.FC<ValidateButtonProps> = ({ formData, clusterList =
       }*/
     }
 
+
+    // db 없는 경우 '없음' 이라고 표현하기 
     if (!formData.standbyEndpoint) {
       isValid = false;
       errors.push("Standby의 엔드포인트를 입력해주세요.");

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+// src/MainPage.tsx
+import React, { useEffect, useState } from 'react';
 import InputBox from '../components/InputBox';
 import ScriptDisplay from '../components/ScriptDisplay';
-import CopyButton from '../components/CopyButton';
 import ValidateButton from '../components/ValidateButton';
+import SelectBox from '../components/SelectBox';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -19,8 +20,17 @@ const Container = styled.div`
 
 const Title = styled.h1`
     text-align: center;
-    margin-bottom: 1.5em;
+    margin-top: 0.65em;
+    margin-bottom: 0.5em;
     color: #fff;
+`;
+
+const Subtitle = styled.h3`
+    text-align: center;
+    margin-bottom: 1.5em;
+    color: #FFCD00;
+    font-size: 1.2em;
+    font-weight: normal;
 `;
 
 const Header = styled.h2`
@@ -84,12 +94,12 @@ const MainPage: React.FC = () => {
     const [secretKey, setSecretKey] = useState('');
     const [email, setEmail] = useState('');
     const [projectName, setProjectName] = useState('');
-    const [projectList, setProjectList] = useState<string[]>([]);
-    const [clusterList, setClusterList] = useState<string[]>([]);
+    const [clusterList, setClusterList] = useState<string[]>([]); // 배열로 유지
     const [clusterName, setClusterName] = useState('');
     const [apiEndpoint, setApiEndpoint] = useState('');
     const [authData, setAuthData] = useState('');
     const [instanceList, setInstanceList] = useState('');
+    const [instanceName, setInstanceName] = useState('');
     const [primaryEndpoint, setPrimaryEndpoint] = useState('');
     const [standbyEndpoint, setStandbyEndpoint] = useState('');
     const [dockerImageName, setDockerImageName] = useState('demo-spring-boot');
@@ -97,17 +107,41 @@ const MainPage: React.FC = () => {
     const [script, setScript] = useState('');
     const [loading, setLoading] = useState(false);
     const [loadingButton, setLoadingButton] = useState<string | null>(null);
-    
+    const [instanceEndpoints, setInstanceEndpoints] = useState<{ [key: string]: { primary_endpoint: string, standby_endpoint: string } }>({});
 
-    const handleApiButtonClick = async (id: string, apiFunction: () => Promise<void>) => {
+
+    const handleApiButtonClick = async (id: string, apiFunction: (arg?: string) => Promise<void>, arg?: string) => {
         setLoadingButton(id);
         try {
-            await apiFunction();
+            await apiFunction(arg);
         } finally {
             setLoadingButton(null);
         }
     };
-    
+
+    const handleInstanceNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedInstanceName = event.target.value;
+        setInstanceName(selectedInstanceName);
+        handleApiButtonClick('fetchInstanceEndpoints', fetchInstanceEndpoints, selectedInstanceName);
+    };
+
+    const handleClusterNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedClusterName = event.target.value;
+        setClusterName(selectedClusterName);
+        handleApiButtonClick('fetchKubeConfig', fetchKubeConfig, selectedClusterName);
+    };
+
+
+    const handleFetchProjectsAndClusters = async () => {
+        await fetchProjects();
+        await fetchClusters();
+        await fetchInstanceLists();
+    };
+
+    useEffect(() => {
+        fetchInstanceLists();
+    }, []);
+
     const generateScript = () => {
         const newScript = `#!/bin/bash
 echo "kakaocloud: 1.Starting environment variable setup"
@@ -144,8 +178,6 @@ sudo -E ./script.sh`;
         alert('스크립트가 생성되고 클립보드에 복사되었습니다.');
     };
 
-    
-
     const fetchProjects = async () => {
         setLoading(true);
         try {
@@ -155,12 +187,12 @@ sudo -E ./script.sh`;
             });
             const projectName = response.data.project_name;
             setProjectName(projectName);
-
         } catch (error) {
             console.error('API 호출 오류:', error);
         }
         setLoading(false);
     };
+
 
 
     const fetchClusters = async () => {
@@ -170,16 +202,19 @@ sudo -E ./script.sh`;
                 access_key_id: accessKey,
                 access_key_secret: secretKey,
             });
+
             const clusterNames = response.data.items.map((item: any) => item.name);
-            setClusterList(clusterNames);
-            if (clusterNames.length > 0) {
-                setClusterName(clusterNames[0]); // 첫 번째 클러스터 이름 설정
-            }
+
+            setClusterList(clusterNames); // 배열로 설정
+
         } catch (error) {
             console.error('API 호출 오류:', error);
         }
         setLoading(false);
     };
+
+
+
     const fetchInstanceLists = async () => {
         setLoading(true);
         try {
@@ -187,43 +222,53 @@ sudo -E ./script.sh`;
                 access_key_id: accessKey,
                 access_key_secret: secretKey,
             });
-            const instanceSetNames = response.data.join(', ');
-            setInstanceList(instanceSetNames);
+            const instanceSetNames = response.data;  // 이미 배열 형태라고 가정
+            setInstanceList(instanceSetNames.join(', '));
+
         } catch (error) {
             console.error('API 호출 오류:', error);
         }
         setLoading(false);
     };
 
-
-    const fetchInstanceEndpoints = async () => {
+    const fetchInstanceEndpoints = async (selectedInstanceName?: string) => {
         setLoading(true);
         try {
             const response = await axios.post('http://61.109.237.248:8000/get-instance-endpoints', {
                 access_key_id: accessKey,
                 access_key_secret: secretKey,
+                instance_set_name: selectedInstanceName  // instance_set_name 추가
             });
-            
-            setPrimaryEndpoint(response.data.primary_endpoint);
-            setStandbyEndpoint(response.data.standby_endpoint);
+            console.log('전체 응답 데이터:', response.data); // 전체 응답 데이터 확인용 로그
+
+            const { primary_endpoint, standby_endpoint } = response.data;
+            setInstanceEndpoints(prev => ({
+                [selectedInstanceName as string]: { primary_endpoint, standby_endpoint } as { primary_endpoint: string, standby_endpoint: string }
+            }));
+            setPrimaryEndpoint(primary_endpoint);
+            setStandbyEndpoint(standby_endpoint);
         } catch (error) {
             console.error('API 호출 오류:', error);
         }
         setLoading(false);
     };
 
-    const fetchKubeConfig = async () => {
+
+
+    const fetchKubeConfig = async (selectedClusterName?: string) => {
         setLoading(true);
         try {
             const response = await axios.post<KubeConfig>('http://61.109.237.248:8000/get-kubeconfig', {
                 access_key_id: accessKey,
                 access_key_secret: secretKey,
+                cluster_name: selectedClusterName  // cluster_name 추가
             });
             const { clusters } = response.data;
-            if (clusters.length > 0) {
-                setClusterName(clusters[0].name);
-                setApiEndpoint(clusters[0].cluster.server);
-                setAuthData(clusters[0].cluster["certificate-authority-data"]);
+            const selectedCluster = clusters.find(cluster => cluster.name === selectedClusterName);
+            if (selectedCluster) {
+                setClusterName(selectedCluster.name);
+                setApiEndpoint(selectedCluster.cluster.server);
+                setAuthData(selectedCluster.cluster["certificate-authority-data"]);
             }
         } catch (error) {
             console.error('API 호출 오류:', error);
@@ -234,6 +279,10 @@ sudo -E ./script.sh`;
     const handleConsoleClick = (url: string) => {
         window.open(url, '_blank');
     };
+
+    useEffect(() => {
+        fetchInstanceLists();
+    }, []);
 
     const formData = {
         accessKey,
@@ -250,10 +299,11 @@ sudo -E ./script.sh`;
         dockerJavaVersion,
     };
 
+
     return (
         <Container>
-            <Header>kakaocloud 교육용</Header>
             <Title>Bastion VM 스크립트 생성</Title>
+            <Subtitle>kakaocloud 교육용</Subtitle>
             <GroupContainer>
                 <InputBox label="1. 사용자 액세스 키" placeholder="직접 입력" value={accessKey} onChange={(e) => setAccessKey(e.target.value)} />
                 <InputBox label="2. 사용자 액세스 보안 키" placeholder="직접 입력" value={secretKey} onChange={(e) => setSecretKey(e.target.value)} />
@@ -266,92 +316,84 @@ sudo -E ./script.sh`;
                     value={projectName}
                     onChange={(e) => setProjectName(e.target.value)}
                     showApiButton
-                    onApiClick={() => handleApiButtonClick('fetchProjects', fetchProjects)}
+                    onApiClick={() => handleApiButtonClick('fetchProjects', handleFetchProjectsAndClusters)}
                     isLoading={loadingButton === 'fetchProjects'}
                     disableAll={!!loadingButton}
                 />
             </GroupContainer>
             <GroupContainer>
-                <InputBox
+                <SelectBox
                     label="5. 클러스터 리스트"
-                    placeholder=""
-                    value={clusterList.join(', ')}
-                    onChange={(e) => setClusterList(e.target.value.split(', '))}
+                    value={clusterName}
+                    options={clusterList}
+                    onChange={handleClusterNameChange}
+                    disabled={loadingButton === 'fetchClusters'}
+                />
+                <InputBox
+                    label="6. 클러스터 이름"
+                    placeholder="직접 입력"
+                    value={clusterName}
+                    onChange={(e) => setClusterName(e.target.value)}
                     height="100px"
-                    showApiButton
-                    readOnly={true}
-                    onApiClick={() => handleApiButtonClick('fetchClusters', fetchClusters)}        
-                    isLoading={loadingButton === 'fetchClusters'}
-                    disableAll={!!loadingButton}
-                    />
-                <InputBox 
-                    label="6. 클러스터 이름" 
-                    placeholder="직접 입력" 
-                    value={clusterName} 
-                    onChange={(e) => setClusterName(e.target.value)} 
-                    height="100px"
-                    showApiButton
-                    onApiClick={() => handleApiButtonClick('fetchClusterName', fetchKubeConfig)}
+                    //showApiButton
+                    onApiClick={() => handleApiButtonClick('fetchClusterName', fetchKubeConfig, clusterName)}
                     isLoading={loadingButton === 'fetchClusterName'}
                     disableAll={!!loadingButton}
-                    />
-                <InputBox 
-                    label="7. 클러스터의 API 엔드포인트" 
-                    placeholder="직접 입력" 
-                    value={apiEndpoint} 
-                    onChange={(e) => setApiEndpoint(e.target.value)} 
+                />
+                <InputBox
+                    label="7. 클러스터의 API 엔드포인트"
+                    placeholder="직접 입력"
+                    value={apiEndpoint}
+                    onChange={(e) => setApiEndpoint(e.target.value)}
                     height="100px"
-                    showApiButton
-                    onApiClick={() => handleApiButtonClick('fetchApiEndpoint', fetchKubeConfig)}
+                    //showApiButton
+                    onApiClick={() => handleApiButtonClick('fetchApiEndpoint', fetchKubeConfig, clusterName)}
                     isLoading={loadingButton === 'fetchApiEndpoint'}
                     disableAll={!!loadingButton}
-                    />
-                <InputBox 
-                    label="8. 클러스터의 certificate-authority-data" 
-                    placeholder="직접 입력" 
-                    value={authData} 
+                />
+                <InputBox
+                    label="8. 클러스터의 certificate-authority-data"
+                    placeholder="직접 입력"
+                    value={authData}
                     onChange={(e) => setAuthData(e.target.value)}
                     height="100px"
-                    showApiButton
-                    onApiClick={() => handleApiButtonClick('fetchAuthData', fetchKubeConfig)}
+                    //showApiButton
+                    onApiClick={() => handleApiButtonClick('fetchAuthData', fetchKubeConfig, clusterName)}
                     isLoading={loadingButton === 'fetchAuthData'}
                     disableAll={!!loadingButton}
-                    />
+                />
+
             </GroupContainer>
             <GroupContainer>
-                <InputBox
+                <SelectBox
                     label="9. 인스턴스 그룹 리스트"
-                    placeholder=""
-                    value={instanceList}
-                    onChange={(e) => setInstanceList(e.target.value)}
-                    height="100px"
-                    showApiButton
-                    readOnly={true}
-                    onApiClick={() => handleApiButtonClick('fetchInstanceLists', fetchInstanceLists)}
-                    isLoading={loadingButton === 'fetchInstanceLists'}
-                    disableAll={!!loadingButton}
-                    />
-                <InputBox 
-                    label="10. Primary의 엔드포인트" 
-                    placeholder="직접 입력" value={primaryEndpoint} 
+                    value={instanceName}
+                    options={instanceList.split(', ')}
+                    onChange={handleInstanceNameChange}
+                    disabled={loadingButton === 'fetchInstanceLists'}
+                />
+                <InputBox
+                    label="10. Primary의 엔드포인트"
+                    placeholder="직접 입력"
+                    value={primaryEndpoint}
                     onChange={(e) => setPrimaryEndpoint(e.target.value)}
                     height="100px"
-                    showApiButton
-                    onApiClick={() => handleApiButtonClick('fetchInstancePrimaryEndpoints', fetchInstanceEndpoints)}
+                    //showApiButton
+                    onApiClick={() => handleApiButtonClick('fetchInstancePrimaryEndpoints', fetchInstanceEndpoints, instanceName)}
                     isLoading={loadingButton === 'fetchInstancePrimaryEndpoints'}
                     disableAll={!!loadingButton}
-                    />
-                <InputBox 
-                    label="11. Standby의 엔드포인트" 
-                    placeholder="직접 입력" 
-                    value={standbyEndpoint} 
-                    onChange={(e) => setStandbyEndpoint(e.target.value)} 
+                />
+                <InputBox
+                    label="11. Standby의 엔드포인트"
+                    placeholder="직접 입력"
+                    value={standbyEndpoint}
+                    onChange={(e) => setStandbyEndpoint(e.target.value)}
                     height="100px"
-                    showApiButton
-                    onApiClick={() => handleApiButtonClick('fetchInstanceStandbyEndpoints', fetchInstanceEndpoints)}
+                    //showApiButton
+                    onApiClick={() => handleApiButtonClick('fetchInstanceStandbyEndpoints', fetchInstanceEndpoints, instanceName)}
                     isLoading={loadingButton === 'fetchInstanceStandbyEndpoints'}
                     disableAll={!!loadingButton}
-                    />
+                />
             </GroupContainer>
             <GroupContainer>
                 <InputBox label="12. Docker Image 이름" placeholder="직접 입력" value={dockerImageName} onChange={(e) => setDockerImageName(e.target.value)} />
