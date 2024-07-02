@@ -1,4 +1,3 @@
-// src/components/InputBox.tsx
 import React from 'react';
 import styled from 'styled-components';
 import ApiButton from './ApiButton';
@@ -12,10 +11,11 @@ interface InputBoxProps {
     height?: string;
     showApiButton?: boolean;
     onApiClick?: (() => void);
-    onConsoleClick?: (() => void); // 콘솔로 조회 버튼 클릭 핸들러
-    isLoading?: boolean; // 추가된 속성
-    readOnly?: boolean; // readOnly prop 추가
-    disableAll?: boolean; // 다른 버튼 비활성화
+    onConsoleClick?: (() => void);
+    isLoading?: boolean;
+    readOnly?: boolean;
+    disableAll?: boolean;
+    error?: string;
 }
 
 const Container = styled.div`
@@ -43,19 +43,26 @@ const Label = styled.label`
     color: white;
 `;
 
-const Input = styled.input<{ height?: string }>`
+const Input = styled.input<{ height?: string; hasError?: boolean }>`
     width: 100%;
     padding: 0.75em;
-    border: 1px solid #ccc;
+    border: 1px solid ${({ hasError }) => (hasError ? 'red' : '#ccc')};
+    color: ${({ hasError }) => (hasError ? 'red' : 'black')};
     border-radius: 4px;
     transition: all 0.3s ease;
     height: ${(props) => props.height || 'auto'};
 
     &:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+        border-color: ${({ hasError }) => (hasError ? 'red' : '#007bff')};
+        box-shadow: 0 0 8px ${({ hasError }) => (hasError ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 123, 255, 0.2)')};
         outline: none;
     }
+`;
+
+
+const ErrorMessage = styled.div`
+    color: red;
+    margin-top: 0.5em;
 `;
 
 const ButtonContainer = styled.div`
@@ -63,19 +70,41 @@ const ButtonContainer = styled.div`
     gap: 0.5em;
 `;
 
-const InputBox: React.FC<InputBoxProps> = ({ label, placeholder, value, onChange, height, showApiButton, onApiClick, onConsoleClick, isLoading, readOnly, disableAll}) => {
+const InputBox: React.FC<InputBoxProps> = ({
+                                               label,
+                                               placeholder,
+                                               value,
+                                               onChange,
+                                               height,
+                                               showApiButton,
+                                               onApiClick,
+                                               onConsoleClick,
+                                               isLoading,
+                                               readOnly,
+                                               disableAll,
+                                               error
+                                           }) => {
     return (
         <Container>
             <LabelContainer>
                 <Label>{label}</Label>
                 {showApiButton && (
                     <ButtonContainer>
-                        {onConsoleClick && <SharedButton onClick={onConsoleClick}> disabled={disableAll} 콘솔로 조회</SharedButton>}
-                        {onApiClick && <ApiButton id = {label} label="API로 조회" onClick={onApiClick} isLoading={isLoading || false } disabled={disableAll} />}
+                        {onConsoleClick && <SharedButton onClick={onConsoleClick} disabled={disableAll}>콘솔로 조회</SharedButton>}
+                        {onApiClick && <ApiButton id={label} label="API로 조회" onClick={onApiClick} isLoading={isLoading || false} disabled={disableAll} />}
                     </ButtonContainer>
                 )}
             </LabelContainer>
-            <Input type="text" placeholder={placeholder} value={value} onChange={onChange} height={height} readOnly={readOnly} />
+            <Input
+                type="text"
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+                height={height}
+                readOnly={readOnly}
+                hasError={!!error}
+            />
+            {error && <ErrorMessage>{error}</ErrorMessage>}
         </Container>
     );
 };

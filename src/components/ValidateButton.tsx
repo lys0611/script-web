@@ -1,4 +1,3 @@
-// src/components/ValidateButton.tsx
 import React from 'react';
 import styled from 'styled-components';
 
@@ -40,142 +39,149 @@ interface FormData {
 
 interface ValidateButtonProps {
   formData: FormData;
+  setErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
   clusterList: string[];
 }
 
-const ValidateButton: React.FC<ValidateButtonProps> = ({ formData, clusterList = []}) => {
+const ValidateButton: React.FC<ValidateButtonProps> = ({ formData, setErrors, clusterList = [] }) => {
   const validate = () => {
+    const newErrors: { [key: string]: string } = {};
     let isValid = true;
-    const errors: string[] = [];
 
-    console.log("Access Key:", formData.accessKey);
-    console.log("Secret Key:", formData.secretKey);
-
-    const accessKeyPattern = /^[a-z0-9]{32}$/;
-    if (!formData.accessKey) {
+    // 액세스 키 유효성 검사
+    if (formData.accessKey.length < 32) {
       isValid = false;
-      errors.push("사용자 액세스 키를 입력해주세요.");
-    } else if (!accessKeyPattern.test(formData.accessKey)) {
+      newErrors.accessKey = '액세스 키는 최소 32자리여야 합니다.';
+    } else if (!/^[a-z0-9]+$/.test(formData.accessKey)) {
       isValid = false;
-      errors.push("사용자 액세스 키는 32자의 영숫자여야 합니다.");
+      newErrors.accessKey = '액세스 키는 소문자와 숫자로만 구성되어야 합니다.';
     }
 
-    const secretKeyPattern = /^[a-z0-9]{70}$/;
-    if (!formData.secretKey) {
+    // 비밀 액세스 키 유효성 검사
+    if (formData.secretKey.length < 64) {
       isValid = false;
-      errors.push("사용자 액세스 보안 키를 입력해주세요.");
-    } else if (!secretKeyPattern.test(formData.secretKey)) {
+      newErrors.secretKey = '비밀 액세스 키는 최소 64자리여야 합니다.';
+    } else if (!/^[a-z0-9]+$/.test(formData.secretKey)) {
       isValid = false;
-      errors.push("사용자 액세스 보안 키는 70자의 영숫자여야 합니다.");
+      newErrors.secretKey = '비밀 액세스 키는 소문자와 숫자로만 구성되어야 합니다.';
     }
 
-    const projectNamePattern = /^[a-z][a-z0-9-]{3,29}$/;
-    if (!formData.projectName) {
+    // 이메일 유효성 검사
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       isValid = false;
-      errors.push("프로젝트 이름을 입력해주세요.");
-    } else if (!projectNamePattern.test(formData.projectName)) {
-      isValid = false;
-      errors.push("프로젝트 이름은 영어로 시작하고, 소문자, 숫자, '-'만 입력할 수 있으며 4~30자 사이여야 합니다.")
-    } // API로 프로젝트 존재하는지 확인
-  
-
-    if (!formData.clusterName) {
-      isValid = false;
-      errors.push("클러스터 이름을 입력해주세요.");
-    } else if (!clusterList.includes(formData.clusterName)) {
-      isValid = false;
-      errors.push("클러스터 이름이 유효하지 않습니다.");
+      newErrors.email = '유효한 이메일 형식이 아닙니다.';
     }
 
+    // API 엔드포인트 유효성 검사
     const apiEndpointPattern = /^https:\/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-public\.ke\.kr-central-2\.kakaocloud\.com$/;
-    if (!formData.apiEndpoint) {
+    if (!apiEndpointPattern.test(formData.apiEndpoint)) {
       isValid = false;
-      errors.push("클러스터의 API 엔드포인트를 입력해주세요.");
-    } else if (!apiEndpointPattern.test(formData.apiEndpoint)) {
-      isValid = false;
-      errors.push("클러스터의 API 엔드포인트 형식이 올바르지 않습니다.");
+      newErrors.apiEndpoint = 'API 엔드포인트 형식이 유효하지 않습니다.';
     }
 
-    const authDataPattern = /^[A-Za-z0-9+/=]+$/; // Base64 형식 검사
-    if (!formData.authData) {
+    // 인증 데이터 유효성 검사
+    const authDataPattern = /^[A-Za-z0-9+/=]+$/;
+    if (!authDataPattern.test(formData.authData)) {
       isValid = false;
-      errors.push("클러스터의 certificate-authority-data를 입력해주세요.");
-    } else if (!authDataPattern.test(formData.authData)) {
+      newErrors.authData = '인증 데이터는 유효한 Base64 형식이어야 합니다.';
+    } else if (!formData.authData.endsWith('=')) {
       isValid = false;
-      errors.push("클러스터의 certificate-authority-data 형식이 올바르지 않습니다.");
+      newErrors.authData = '인증 데이터는 "="로 끝나야 합니다.';
     } else {
       try {
         const decodedAuthData = atob(formData.authData);
         const pemPattern = /-----BEGIN CERTIFICATE-----[\s\S]+-----END CERTIFICATE-----/;
         if (!pemPattern.test(decodedAuthData)) {
           isValid = false;
-          errors.push("클러스터의 certificate-authority-data가 유효한 PEM 형식의 인증서가 아닙니다.");
+          newErrors.authData = '인증 데이터는 유효한 PEM 형식의 인증서여야 합니다.';
         }
       } catch (e) {
         isValid = false;
-        errors.push("클러스터의 certificate-authority-data를 Base64로 디코딩할 수 없습니다.");
+        newErrors.authData = '인증 데이터를 Base64로 디코딩할 수 없습니다.';
       }
     }
 
-    //위에서 조회된 프로젝트명과 동일한지 체크
-    const dbEndpointPattern = /^az-[ab]\.db-[a-z]{3}\.[0-9a-f]{32}\.mysql\.managed-service\.kr-central-2\.kakaocloud\.com$/;
+    // 프로젝트명 유효성 검사
+    if (!/^[a-z]/.test(formData.projectName)) {
+      isValid = false;
+      newErrors.projectName = '프로젝트명은 영어 소문자로 시작해야 합니다.';
+    } else if (!/^[a-z0-9-]+$/.test(formData.projectName)) {
+      isValid = false;
+      newErrors.projectName = '프로젝트명은 소문자, 숫자, "-"만 사용해야 합니다.';
+    } else if (formData.projectName.length < 4 || formData.projectName.length > 30) {
+      isValid = false;
+      newErrors.projectName = '프로젝트명은 4~30자리여야 합니다.';
+    }
 
-    if (!formData.primaryEndpoint) {
+    // Primary 엔드포인트 유효성 검사
+    if (!formData.primaryEndpoint.startsWith('az-')) {
       isValid = false;
-      errors.push("Primary의 엔드포인트를 입력해주세요.");
-    } else if (!dbEndpointPattern.test(formData.primaryEndpoint)) {
-      isValid = false;
-      errors.push("Primary의 엔드포인트 형식이 올바르지 않습니다.");
+      newErrors.primaryEndpoint = 'Primary 엔드포인트는 az-a 또는 az-b로 시작해야 합니다.';
     } else {
-      const primaryEndpointParts = formData.primaryEndpoint.split('.');
-      const primaryProjectName = primaryEndpointParts[2]; // UUID 위치 (ae90ddc1b6dc4b0581bb44b31f8921b5)
-
-      /*if (primaryProjectName !== formData.projectName의 UUID) {
+      const primaryParts = formData.primaryEndpoint.split('.');
+      if (primaryParts.length < 6 || (primaryParts[0] !== 'az-a' && primaryParts[0] !== 'az-b')) {
         isValid = false;
-        errors.push("DB의 프로젝트 이름이 동일하지 않습니다.");
-      }*/
+        newErrors.primaryEndpoint = 'Primary 엔드포인트 형식이 유효하지 않습니다.';
+      } else if (primaryParts[1] !== 'db-les') {
+        isValid = false;
+        newErrors.primaryEndpoint = 'Primary 엔드포인트는 "db-les"로 시작해야 합니다.';
+      } else if (!/^[0-9a-f]{32}$/.test(primaryParts[2])) {
+        isValid = false;
+        newErrors.primaryEndpoint = 'Primary 엔드포인트의 UUID 형식이 유효하지 않습니다.';
+      } else if (primaryParts.slice(3).join('.') !== 'mysql.managed-service.kr-central-2.kakaocloud.com') {
+        isValid = false;
+        newErrors.primaryEndpoint = 'Primary 엔드포인트는 "mysql.managed-service.kr-central-2.kakaocloud.com"로 끝나야 합니다.';
+      }
     }
 
-
-    // db 없는 경우 '없음' 이라고 표현하기 
-    if (!formData.standbyEndpoint) {
+    // Standby 엔드포인트 유효성 검사
+    if (!formData.standbyEndpoint.startsWith('az-')) {
       isValid = false;
-      errors.push("Standby의 엔드포인트를 입력해주세요.");
-    } else if (!dbEndpointPattern.test(formData.standbyEndpoint)) {
-      isValid = false;
-      errors.push("Standby의 엔드포인트 형식이 올바르지 않습니다.");
+      newErrors.standbyEndpoint = 'Standby 엔드포인트는 az-a 또는 az-b로 시작해야 합니다.';
     } else {
-      const standbyEndpointParts = formData.standbyEndpoint.split('.');
-      const standbyProjectName = standbyEndpointParts[2]; // UUID 위치 (ae90ddc1b6dc4b0581bb44b31f8921b5)
-
-      /*if (standbyProjectName !== formData.projectName의 UUID) {
+      const standbyParts = formData.standbyEndpoint.split('.');
+      if (standbyParts.length < 6 || (standbyParts[0] !== 'az-a' && standbyParts[0] !== 'az-b')) {
         isValid = false;
-        errors.push("DB의 프로젝트 이름이 동일하지 않습니다.");
-      }*/
+        newErrors.standbyEndpoint = 'Standby 엔드포인트 형식이 유효하지 않습니다.';
+      } else if (standbyParts[1] !== 'db-les') {
+        isValid = false;
+        newErrors.standbyEndpoint = 'Standby 엔드포인트는 "db-les"로 시작해야 합니다.';
+      } else if (!/^[0-9a-f]{32}$/.test(standbyParts[2])) {
+        isValid = false;
+        newErrors.standbyEndpoint = 'Standby 엔드포인트의 UUID 형식이 유효하지 않습니다.';
+      } else if (standbyParts.slice(3).join('.') !== 'mysql.managed-service.kr-central-2.kakaocloud.com') {
+        isValid = false;
+        newErrors.standbyEndpoint = 'Standby 엔드포인트는 "mysql.managed-service.kr-central-2.kakaocloud.com"로 끝나야 합니다.';
+      }
     }
 
-
-
-    if (!formData.dockerImageName) {
+    // az-a와 az-b의 상호 검증
+    if (formData.primaryEndpoint.startsWith('az-a') && !formData.standbyEndpoint.startsWith('az-b')) {
       isValid = false;
-      errors.push("Docker Image 이름을 입력해주세요.");
-    } else if (formData.dockerImageName !== "demo-spring-boot") {
+      newErrors.standbyEndpoint = 'Primary 엔드포인트가 az-a로 시작하면 Standby 엔드포인트는 az-b로 시작해야 합니다.';
+    } else if (formData.primaryEndpoint.startsWith('az-b') && !formData.standbyEndpoint.startsWith('az-a')) {
       isValid = false;
-      errors.push("Docker Image 이름은 'demo-spring-boot'이어야 합니다.");
+      newErrors.standbyEndpoint = 'Primary 엔드포인트가 az-b로 시작하면 Standby 엔드포인트는 az-a로 시작해야 합니다.';
     }
 
-    if (!formData.dockerJavaVersion) {
-      isValid = false;
-      errors.push("Docker Image Base Java Version을 입력해주세요.");
-    } else if (formData.dockerJavaVersion !== "17-jdk-slim") {
-      isValid = false;
-      errors.push("Docker Image Base Java Version은 '17-jdk-slim'이어야 합니다.");
-    }
+    // // Docker 이미지 이름 유효성 검사
+    // if (formData.dockerImageName !== 'demo-spring-boot') {
+    //   isValid = false;
+    //   newErrors.dockerImageName = 'Docker 이미지 이름은 demo-spring-boot이어야 합니다.';
+    // }
+    //
+    // // Docker Java 버전 유효성 검사
+    // if (formData.dockerJavaVersion !== '17-jdk-slim') {
+    //   isValid = false;
+    //   newErrors.dockerJavaVersion = 'Docker Java 버전은 17-jdk-slim이어야 합니다.';
+    // }
+
+    setErrors(newErrors);
 
     if (isValid) {
-      alert('검증 완료: 입력이 올바릅니다!');
+      alert('모든 입력이 유효합니다.');
     } else {
-      alert(`Form has errors:\n${errors.join('\n')}`);
+      alert('입력에 오류가 있습니다. 각 필드를 확인하세요.');
     }
   };
 

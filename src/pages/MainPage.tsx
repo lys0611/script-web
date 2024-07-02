@@ -1,4 +1,3 @@
-// src/MainPage.tsx
 import React, { useEffect, useState } from 'react';
 import InputBox from '../components/InputBox';
 import ScriptDisplay from '../components/ScriptDisplay';
@@ -94,7 +93,7 @@ const MainPage: React.FC = () => {
     const [secretKey, setSecretKey] = useState('');
     const [email, setEmail] = useState('');
     const [projectName, setProjectName] = useState('');
-    const [clusterList, setClusterList] = useState<string[]>([]); // 배열로 유지
+    const [clusterList, setClusterList] = useState<string[]>([]);
     const [clusterName, setClusterName] = useState('');
     const [apiEndpoint, setApiEndpoint] = useState('');
     const [authData, setAuthData] = useState('');
@@ -108,7 +107,7 @@ const MainPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [loadingButton, setLoadingButton] = useState<string | null>(null);
     const [instanceEndpoints, setInstanceEndpoints] = useState<{ [key: string]: { primary_endpoint: string, standby_endpoint: string } }>({});
-
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const handleApiButtonClick = async (id: string, apiFunction: (arg?: string) => Promise<void>, arg?: string) => {
         setLoadingButton(id);
@@ -130,7 +129,6 @@ const MainPage: React.FC = () => {
         setClusterName(selectedClusterName);
         handleApiButtonClick('fetchKubeConfig', fetchKubeConfig, selectedClusterName);
     };
-
 
     const handleFetchProjectsAndClusters = async () => {
         await fetchProjects();
@@ -193,8 +191,6 @@ sudo -E ./script.sh`;
         setLoading(false);
     };
 
-
-
     const fetchClusters = async () => {
         setLoading(true);
         try {
@@ -212,8 +208,6 @@ sudo -E ./script.sh`;
         }
         setLoading(false);
     };
-
-
 
     const fetchInstanceLists = async () => {
         setLoading(true);
@@ -252,8 +246,6 @@ sudo -E ./script.sh`;
         }
         setLoading(false);
     };
-
-
 
     const fetchKubeConfig = async (selectedClusterName?: string) => {
         setLoading(true);
@@ -299,15 +291,32 @@ sudo -E ./script.sh`;
         dockerJavaVersion,
     };
 
-
     return (
         <Container>
             <Title>Bastion VM 스크립트 생성</Title>
             <Subtitle>kakaocloud 교육용</Subtitle>
             <GroupContainer>
-                <InputBox label="1. 사용자 액세스 키" placeholder="직접 입력" value={accessKey} onChange={(e) => setAccessKey(e.target.value)} />
-                <InputBox label="2. 사용자 액세스 보안 키" placeholder="직접 입력" value={secretKey} onChange={(e) => setSecretKey(e.target.value)} />
-                <InputBox label="3. 사용자 이메일" placeholder="직접 입력" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <InputBox
+                    label="1. 사용자 액세스 키"
+                    placeholder="직접 입력"
+                    value={accessKey}
+                    onChange={(e) => setAccessKey(e.target.value)}
+                    error={errors.accessKey}
+                />
+                <InputBox
+                    label="2. 사용자 액세스 보안 키"
+                    placeholder="직접 입력"
+                    value={secretKey}
+                    onChange={(e) => setSecretKey(e.target.value)}
+                    error={errors.secretKey}
+                />
+                <InputBox
+                    label="3. 사용자 이메일"
+                    placeholder="직접 입력"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    error={errors.email}
+                />
             </GroupContainer>
             <GroupContainer>
                 <InputBox
@@ -319,6 +328,7 @@ sudo -E ./script.sh`;
                     onApiClick={() => handleApiButtonClick('fetchProjects', handleFetchProjectsAndClusters)}
                     isLoading={loadingButton === 'fetchProjects'}
                     disableAll={!!loadingButton}
+                    error={errors.projectName}
                 />
             </GroupContainer>
             <GroupContainer>
@@ -335,10 +345,10 @@ sudo -E ./script.sh`;
                     value={clusterName}
                     onChange={(e) => setClusterName(e.target.value)}
                     height="100px"
-                    //showApiButton
                     onApiClick={() => handleApiButtonClick('fetchClusterName', fetchKubeConfig, clusterName)}
                     isLoading={loadingButton === 'fetchClusterName'}
                     disableAll={!!loadingButton}
+                    error={errors.clusterName}
                 />
                 <InputBox
                     label="7. 클러스터의 API 엔드포인트"
@@ -346,10 +356,10 @@ sudo -E ./script.sh`;
                     value={apiEndpoint}
                     onChange={(e) => setApiEndpoint(e.target.value)}
                     height="100px"
-                    //showApiButton
                     onApiClick={() => handleApiButtonClick('fetchApiEndpoint', fetchKubeConfig, clusterName)}
                     isLoading={loadingButton === 'fetchApiEndpoint'}
                     disableAll={!!loadingButton}
+                    error={errors.apiEndpoint}
                 />
                 <InputBox
                     label="8. 클러스터의 certificate-authority-data"
@@ -357,12 +367,11 @@ sudo -E ./script.sh`;
                     value={authData}
                     onChange={(e) => setAuthData(e.target.value)}
                     height="100px"
-                    //showApiButton
                     onApiClick={() => handleApiButtonClick('fetchAuthData', fetchKubeConfig, clusterName)}
                     isLoading={loadingButton === 'fetchAuthData'}
                     disableAll={!!loadingButton}
+                    error={errors.authData}
                 />
-
             </GroupContainer>
             <GroupContainer>
                 <SelectBox
@@ -378,10 +387,10 @@ sudo -E ./script.sh`;
                     value={primaryEndpoint}
                     onChange={(e) => setPrimaryEndpoint(e.target.value)}
                     height="100px"
-                    //showApiButton
                     onApiClick={() => handleApiButtonClick('fetchInstancePrimaryEndpoints', fetchInstanceEndpoints, instanceName)}
                     isLoading={loadingButton === 'fetchInstancePrimaryEndpoints'}
                     disableAll={!!loadingButton}
+                    error={errors.primaryEndpoint}
                 />
                 <InputBox
                     label="11. Standby의 엔드포인트"
@@ -389,19 +398,35 @@ sudo -E ./script.sh`;
                     value={standbyEndpoint}
                     onChange={(e) => setStandbyEndpoint(e.target.value)}
                     height="100px"
-                    //showApiButton
                     onApiClick={() => handleApiButtonClick('fetchInstanceStandbyEndpoints', fetchInstanceEndpoints, instanceName)}
                     isLoading={loadingButton === 'fetchInstanceStandbyEndpoints'}
                     disableAll={!!loadingButton}
+                    error={errors.standbyEndpoint}
                 />
             </GroupContainer>
             <GroupContainer>
-                <InputBox label="12. Docker Image 이름" placeholder="직접 입력" value={dockerImageName} onChange={(e) => setDockerImageName(e.target.value)} />
-                <InputBox label="13. Docker Image Base Java Version" placeholder="직접 입력" value={dockerJavaVersion} onChange={(e) => setDockerJavaVersion(e.target.value)} />
+                <InputBox
+                    label="12. Docker Image 이름"
+                    placeholder="직접 입력"
+                    value={dockerImageName}
+                    onChange={(e) => setDockerImageName(e.target.value)}
+                    error={errors.dockerImageName}
+                />
+                <InputBox
+                    label="13. Docker Image Base Java Version"
+                    placeholder="직접 입력"
+                    value={dockerJavaVersion}
+                    onChange={(e) => setDockerJavaVersion(e.target.value)}
+                    error={errors.dockerJavaVersion}
+                />
             </GroupContainer>
             <ButtonContainer>
                 <StyledButton onClick={generateScript}>스크립트 생성 및 클립보드로 복사</StyledButton>
-                <ValidateButton formData={formData} clusterList={clusterList}/>
+                <ValidateButton
+                    formData={formData}
+                    setErrors={setErrors}
+                    clusterList={clusterList}
+                />
             </ButtonContainer>
             <ScriptDisplay script={script} />
             <ButtonContainer>
