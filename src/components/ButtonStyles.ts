@@ -2,7 +2,7 @@
 import styled from 'styled-components';
 
 export const SharedButton = styled.button`
-    background-color: #e9e445;
+    background-color: #ffe100;
     color: #000;
     border: none;
     padding: 0.4em 1em;
@@ -14,7 +14,7 @@ export const SharedButton = styled.button`
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 
     &:hover {
-        background-color: #ffce00;
+        background-color: #FFEC4F;
     }
 
     &:focus {

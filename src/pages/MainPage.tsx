@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import InputBox from '../components/InputBox';
 import ScriptDisplay from '../components/ScriptDisplay';
-import ValidateButton from '../components/ValidateButton';
 import SelectBox from '../components/SelectBox';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -27,7 +26,7 @@ const Title = styled.h1`
 const Subtitle = styled.h3`
     text-align: center;
     margin-bottom: 1.5em;
-    color: #FFCD00;
+    color: #ffe100;
     font-size: 1.2em;
     font-weight: normal;
 `;
@@ -38,7 +37,7 @@ const Header = styled.h2`
     margin-bottom: 0.5em;
     font-size: 2em;
     font-weight: bold;
-    color: #FFCD00; /* 카카오 노란색 */
+    color: #ffe100; /* 카카오 노란색 */
 `;
 
 const GroupContainer = styled.div`
@@ -52,14 +51,14 @@ const GroupContainer = styled.div`
 
 const ButtonContainer = styled.div`
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-top: 2em;
 `;
 
 const StyledButton = styled.button`
-    background-color: #28a745;
-    color: white;
+    background-color: #ffe100; /* 카카오 노란색 */
+    color: black;
     border: none;
     padding: 0.75em 1.5em;
     border-radius: 4px;
@@ -69,12 +68,12 @@ const StyledButton = styled.button`
     margin: 0 1em;
 
     &:hover {
-        background-color: #218838;
+        background-color: #FFEC4F;
     }
 
     &:focus {
         outline: none;
-        box-shadow: 0 0 8px rgba(33, 136, 56, 0.6);
+        box-shadow: 0 0 8px rgba(255, 205, 0, 0.6);
     }
 `;
 
@@ -140,8 +139,139 @@ const MainPage: React.FC = () => {
         fetchInstanceLists();
     }, []);
 
+    const validateForm = () => {
+        const newErrors: { [key: string]: string } = {};
+        let isValid = true;
+
+        // 액세스 키 유효성 검사
+        if (accessKey.length < 32) {
+            isValid = false;
+            newErrors.accessKey = '액세스 키는 최소 32자리여야 합니다.';
+        } else if (!/^[a-z0-9]+$/.test(accessKey)) {
+            isValid = false;
+            newErrors.accessKey = '액세스 키는 소문자와 숫자로만 구성되어야 합니다.';
+        }
+
+        // 비밀 액세스 키 유효성 검사
+        if (secretKey.length < 64) {
+            isValid = false;
+            newErrors.secretKey = '비밀 액세스 키는 최소 64자리여야 합니다.';
+        } else if (!/^[a-z0-9]+$/.test(secretKey)) {
+            isValid = false;
+            newErrors.secretKey = '비밀 액세스 키는 소문자와 숫자로만 구성되어야 합니다.';
+        }
+
+        // 이메일 유효성 검사
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            isValid = false;
+            newErrors.email = '유효한 이메일 형식이 아닙니다.';
+        }
+
+        // 클러스터 이름 유효성 검사
+        if (!/^[a-z]/.test(clusterName)) {
+            isValid = false;
+            newErrors.clusterName = '클러스터 이름은 영어 소문자로 시작해야 합니다.';
+        } else if (!/^[a-z0-9-]+$/.test(clusterName)) {
+            isValid = false;
+            newErrors.clusterName = '클러스터 이름은 소문자, 숫자, "-"만 사용해야 합니다.';
+        } else if (clusterName.length < 4 || clusterName.length > 20) {
+            isValid = false;
+            newErrors.clusterName = '클러스터 이름은 4~20자리여야 합니다.';
+        }
+
+        // API 엔드포인트 유효성 검사
+        const apiEndpointPattern = /^https:\/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-public\.ke\.kr-central-2\.kakaocloud\.com$/;
+        if (!apiEndpointPattern.test(apiEndpoint)) {
+            isValid = false;
+            newErrors.apiEndpoint = 'API 엔드포인트 형식이 유효하지 않습니다.';
+        }
+
+        // 인증 데이터 유효성 검사
+        const authDataPattern = /^[A-Za-z0-9+/=]+$/;
+        if (!authDataPattern.test(authData)) {
+            isValid = false;
+            newErrors.authData = '인증 데이터는 유효한 Base64 형식이어야 합니다.';
+        } else if (!authData.endsWith('=')) {
+            isValid = false;
+            newErrors.authData = '인증 데이터는 "="로 끝나야 합니다.';
+        } else {
+            try {
+                const decodedAuthData = atob(authData);
+                const pemPattern = /-----BEGIN CERTIFICATE-----[\s\S]+-----END CERTIFICATE-----/;
+                if (!pemPattern.test(decodedAuthData)) {
+                    isValid = false;
+                    newErrors.authData = '인증 데이터는 유효한 PEM 형식의 인증서여야 합니다.';
+                }
+            } catch (e) {
+                isValid = false;
+                newErrors.authData = '인증 데이터를 Base64로 디코딩할 수 없습니다.';
+            }
+        }
+
+        // 프로젝트명 유효성 검사
+        if (!/^[a-z]/.test(projectName)) {
+            isValid = false;
+            newErrors.projectName = '프로젝트명은 영어 소문자로 시작해야 합니다.';
+        } else if (!/^[a-z0-9-]+$/.test(projectName)) {
+            isValid = false;
+            newErrors.projectName = '프로젝트명은 소문자, 숫자, "-"만 사용해야 합니다.';
+        } else if (projectName.length < 4 || projectName.length > 30) {
+            isValid = false;
+            newErrors.projectName = '프로젝트명은 4~30자리여야 합니다.';
+        }
+
+        // Primary 엔드포인트 유효성 검사
+        if (!primaryEndpoint.startsWith('az-')) {
+            isValid = false;
+            newErrors.primaryEndpoint = 'Primary 엔드포인트는 az-a 또는 az-b로 시작해야 합니다.';
+        } else {
+            const primaryParts = primaryEndpoint.split('.');
+            if (primaryParts.length < 6 || (primaryParts[0] !== 'az-a' && primaryParts[0] !== 'az-b')) {
+                isValid = false;
+                newErrors.primaryEndpoint = 'Primary 엔드포인트 형식이 유효하지 않습니다.';
+            } else if (!/^[0-9a-f]{32}$/.test(primaryParts[2])) {
+                isValid = false;
+                newErrors.primaryEndpoint = 'Primary 엔드포인트의 UUID 형식이 유효하지 않습니다.';
+            } else if (primaryParts.slice(3).join('.') !== 'mysql.managed-service.kr-central-2.kakaocloud.com') {
+                isValid = false;
+                newErrors.primaryEndpoint = 'Primary 엔드포인트는 "mysql.managed-service.kr-central-2.kakaocloud.com"로 끝나야 합니다.';
+            }
+        }
+
+        // Standby 엔드포인트 유효성 검사
+        if (!standbyEndpoint.startsWith('az-')) {
+            isValid = false;
+            newErrors.standbyEndpoint = 'Standby 엔드포인트는 az-a 또는 az-b로 시작해야 합니다.';
+        } else {
+            const standbyParts = standbyEndpoint.split('.');
+            if (standbyParts.length < 6 || (standbyParts[0] !== 'az-a' && standbyParts[0] !== 'az-b')) {
+                isValid = false;
+                newErrors.standbyEndpoint = 'Standby 엔드포인트 형식이 유효하지 않습니다.';
+            } else if (!/^[0-9a-f]{32}$/.test(standbyParts[2])) {
+                isValid = false;
+                newErrors.standbyEndpoint = 'Standby 엔드포인트의 UUID 형식이 유효하지 않습니다.';
+            } else if (standbyParts.slice(3).join('.') !== 'mysql.managed-service.kr-central-2.kakaocloud.com') {
+                isValid = false;
+                newErrors.standbyEndpoint = 'Standby 엔드포인트는 "mysql.managed-service.kr-central-2.kakaocloud.com"로 끝나야 합니다.';
+            }
+        }
+
+        // az-a와 az-b의 상호 검증
+        if (primaryEndpoint.startsWith('az-a') && !standbyEndpoint.startsWith('az-b')) {
+            isValid = false;
+            newErrors.standbyEndpoint = 'Primary 엔드포인트가 az-a로 시작하면 Standby 엔드포인트는 az-b로 시작해야 합니다.';
+        } else if (primaryEndpoint.startsWith('az-b') && !standbyEndpoint.startsWith('az-a')) {
+            isValid = false;
+            newErrors.standbyEndpoint = 'Primary 엔드포인트가 az-b로 시작하면 Standby 엔드포인트는 az-a로 시작해야 합니다.';
+        }
+
+        setErrors(newErrors);
+        return isValid;
+    };
+
     const generateScript = () => {
-        const newScript = `#!/bin/bash
+        if (validateForm()) {
+            const newScript = `#!/bin/bash
 echo "kakaocloud: 1.Starting environment variable setup"
 # 환경 변수 설정: 사용자는 이 부분에 자신의 환경에 맞는 값을 입력해야 합니다.
 command=$(cat <<EOF
@@ -170,9 +300,12 @@ echo "kakaocloud: Script download site is valid"
 wget https://github.com/kakaocloud-edu/tutorial/raw/main/AdvancedCourse/src/script/script.sh
 chmod +x script.sh
 sudo -E ./script.sh`;
-        setScript(newScript);
-        navigator.clipboard.writeText(newScript);
-        alert('스크립트가 생성되고 클립보드에 복사되었습니다.');
+            setScript(newScript);
+            navigator.clipboard.writeText(newScript);
+            alert('스크립트가 생성되고 클립보드에 복사되었습니다.');
+        } else {
+            alert('각 필드의 유효성을 체크해주세요.');
+        }
     };
 
     const fetchProjects = async () => {
@@ -309,13 +442,6 @@ sudo -E ./script.sh`;
                     onChange={(e) => setSecretKey(e.target.value)}
                     error={errors.secretKey}
                 />
-                {/*<InputBox*/}
-                {/*    label="3. 사용자 이메일"*/}
-                {/*    placeholder="직접 입력"*/}
-                {/*    value={email}*/}
-                {/*    onChange={(e) => setEmail(e.target.value)}*/}
-                {/*    error={errors.email}*/}
-                {/*/>*/}
             </GroupContainer>
             <GroupContainer>
                 <InputBox
@@ -419,16 +545,9 @@ sudo -E ./script.sh`;
                     error={errors.dockerJavaVersion}
                 />
             </GroupContainer>
-            <ButtonContainer>
-                <StyledButton onClick={generateScript}>스크립트 생성 및 클립보드로 복사</StyledButton>
-                <ValidateButton
-                    formData={formData}
-                    setErrors={setErrors}
-                    clusterList={clusterList}
-                />
-            </ButtonContainer>
             <ScriptDisplay script={script} />
             <ButtonContainer>
+                <StyledButton onClick={generateScript}>스크립트 생성 및 복사</StyledButton>
             </ButtonContainer>
         </Container>
     );

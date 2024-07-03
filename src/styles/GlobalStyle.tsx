@@ -39,7 +39,7 @@ const GlobalStyle = createGlobalStyle`
     .shape2 {
         bottom: -80px;
         left: -80px;
-        background: #e9e445;
+        background: #ffce00;
     }
 
     .animated-circle {
