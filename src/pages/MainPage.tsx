@@ -1,4 +1,3 @@
-// src/pages/MainPage.tsx
 import React, { useEffect, useState } from 'react';
 import InputBox from '../components/InputBox';
 import ScriptDisplay from '../components/ScriptDisplay';
@@ -89,18 +88,18 @@ interface KubeConfig {
 }
 
 const MainPage: React.FC = () => {
-    const [accessKey, setAccessKey] = useState('');
-    const [secretKey, setSecretKey] = useState('');
+    const [accessKey, setAccessKey] = useState('669254168b57401f861e1b74840d528a');
+    const [secretKey, setSecretKey] = useState('39c257278bd72d9f8416e92581fd2f21f58703ea8be18076b42fd70ef01dc29d5c8b05');
     const [email, setEmail] = useState('');
-    const [projectName, setProjectName] = useState('');
+    const [projectName, setProjectName] = useState('kakaocloud-edu');
     const [clusterList, setClusterList] = useState<string[]>(['k8s-cluster']);
-    const [clusterName, setClusterName] = useState('');
-    const [apiEndpoint, setApiEndpoint] = useState('');
-    const [authData, setAuthData] = useState('');
+    const [clusterName, setClusterName] = useState('k8s-cluster');
+    const [apiEndpoint, setApiEndpoint] = useState('https://2be0c952-d15f-465b-83c7-cfa96a9d4f2d-public.ke.kr-central-2.kakaocloud.com');
+    const [authData, setAuthData] = useState('LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM2akNDQWRLZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJME1ESXhOVEEyTXprek4xb1hEVE0wTURJeE1qQTJORFF6TjFvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTnVFCmllYUFZWnljY2Z4MzZXSG96eHo2R0RybjJKUVVVTUlrZHR0TUxONXRKVDlDS09MZEY4TTA0U0F4V25oS3p6V2wKTVMwYjQ1NEJESTFuYUxNc0hZYVU5Nno3N3ozeGZKNGxjSGVIMU1STTFjbjZMalNZV09ySnp1Q0hNZmMyamhtbQpuZmNjVm82M3p2d2dZR2xyOGN5Z0l4ZGVZRjlOWmNLRHNVVmFrWkFDWTFTZ0hDdmIvVzhtQ0lqZkRoWUJjTjJuCjlnclpFN1lWZUx6MWt4NUViN2hKNkRla3pkOUZITmdiMTNneHpJZE1DUmJEb2kxOWF4dThiQW1mMjNibWJpSEEKeEs2MjVISmQwK3pQTWprREh3U1gvbnN4UFUrNzQxTlNPMWxYTEs1bVE5NWlnaXhmbUpqUWlob0Vqdjl0cXNCKwppbzEvWUgzcVQyOGJzV2lmQ2tVQ0F3RUFBYU5GTUVNd0RnWURWUjBQQVFIL0JBUURBZ0trTUJJR0ExVWRFd0VBCi93UUlNQVlCQWY4Q0FRQXdIUVlEVlIwT0JCWUVGS0JtcWJoUG15SnJNeVRWa2tUQkwvcnVaZmVXTUEwR0NTcUcKU0liM0RRRUJDd1VBQTRJQkFRQ0k1bTZ1aVg0dmxEZ0I2L0RyMnlKSG8yaEd0MncvWkhYNURra3l4OHRqTXl6RQpEdW96L0kxYkVkR1VURW84MlJCWDlsZUpWZnpFU1JBcFdmdFE1N2oyUWdsVlM4bWd0S1hlWk5QTTR6bFBOWnE0CmxaelNUVTVGd2NiTUxMbitYdmVFYWxhZVFINEl3R1NTTHlsVmpzeUwyVyswL1Rsd3RJMis3YWtNM3BzdnVFT20KRVRZaXFEdEtCaWE3UlgvcWdURlptWTE5OUxJNXZkTWJkdXhMM1N6Mjhweld2d29nTkRrcmNIUnh4SXI0ZVZsdQo2blIxODZoc2o3MjJNRG9DYTBoTFU3U2xzREtZM3ZMWmVpbC9GajRHRGNOVkZqbFRLV3BVMk5NdG9yUGVWZ1hECkN6ZC83VmV4ZlgxcW1uWTY4N0w2SytIbDZPN0JuYlRxNjRVUG8wNEoKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=');
     const [instanceList, setInstanceList] = useState<string[]>(['database']);
-    const [instanceName, setInstanceName] = useState('');
-    const [primaryEndpoint, setPrimaryEndpoint] = useState('');
-    const [standbyEndpoint, setStandbyEndpoint] = useState('');
+    const [instanceName, setInstanceName] = useState('database');
+    const [primaryEndpoint, setPrimaryEndpoint] = useState('az-a.database.ae90ddc1b6dc4b0581bb44b31f8921b5.mysql.managed-service.kr-central-2.kakaocloud.com');
+    const [standbyEndpoint, setStandbyEndpoint] = useState('az-b.database.ae90ddc1b6dc4b0581bb44b31f8921b5.mysql.managed-service.kr-central-2.kakaocloud.com');
     const [dockerImageName, setDockerImageName] = useState('demo-spring-boot');
     const [dockerJavaVersion, setDockerJavaVersion] = useState('17-jdk-slim');
     const [script, setScript] = useState('');
@@ -140,139 +139,9 @@ const MainPage: React.FC = () => {
         fetchInstanceLists();
     }, []);
 
-    const validateForm = () => {
-        const newErrors: { [key: string]: string } = {};
-        let isValid = true;
-
-        // 액세스 키 유효성 검사
-        if (accessKey.length < 32) {
-            isValid = false;
-            newErrors.accessKey = '액세스 키는 최소 32자리여야 합니다.';
-        } else if (!/^[a-z0-9]+$/.test(accessKey)) {
-            isValid = false;
-            newErrors.accessKey = '액세스 키는 소문자와 숫자로만 구성되어야 합니다.';
-        }
-
-        // 비밀 액세스 키 유효성 검사
-        if (secretKey.length < 64) {
-            isValid = false;
-            newErrors.secretKey = '비밀 액세스 키는 최소 64자리여야 합니다.';
-        } else if (!/^[a-z0-9]+$/.test(secretKey)) {
-            isValid = false;
-            newErrors.secretKey = '비밀 액세스 키는 소문자와 숫자로만 구성되어야 합니다.';
-        }
-
-        // 이메일 유효성 검사
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            isValid = false;
-            newErrors.email = '유효한 이메일 형식이 아닙니다.';
-        }
-
-        // 클러스터 이름 유효성 검사
-        if (!/^[a-z]/.test(clusterName)) {
-            isValid = false;
-            newErrors.clusterName = '클러스터 이름은 영어 소문자로 시작해야 합니다.';
-        } else if (!/^[a-z0-9-]+$/.test(clusterName)) {
-            isValid = false;
-            newErrors.clusterName = '클러스터 이름은 소문자, 숫자, "-"만 사용해야 합니다.';
-        } else if (clusterName.length < 4 || clusterName.length > 20) {
-            isValid = false;
-            newErrors.clusterName = '클러스터 이름은 4~20자리여야 합니다.';
-        }
-
-        // API 엔드포인트 유효성 검사
-        const apiEndpointPattern = /^https:\/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-public\.ke\.kr-central-2\.kakaocloud\.com$/;
-        if (!apiEndpointPattern.test(apiEndpoint)) {
-            isValid = false;
-            newErrors.apiEndpoint = 'API 엔드포인트 형식이 유효하지 않습니다.';
-        }
-
-        // 인증 데이터 유효성 검사
-        const authDataPattern = /^[A-Za-z0-9+/=]+$/;
-        if (!authDataPattern.test(authData)) {
-            isValid = false;
-            newErrors.authData = '인증 데이터는 유효한 Base64 형식이어야 합니다.';
-        } else if (!authData.endsWith('=')) {
-            isValid = false;
-            newErrors.authData = '인증 데이터는 "="로 끝나야 합니다.';
-        } else {
-            try {
-                const decodedAuthData = atob(authData);
-                const pemPattern = /-----BEGIN CERTIFICATE-----[\s\S]+-----END CERTIFICATE-----/;
-                if (!pemPattern.test(decodedAuthData)) {
-                    isValid = false;
-                    newErrors.authData = '인증 데이터는 유효한 PEM 형식의 인증서여야 합니다.';
-                }
-            } catch (e) {
-                isValid = false;
-                newErrors.authData = '인증 데이터를 Base64로 디코딩할 수 없습니다.';
-            }
-        }
-
-        // 프로젝트명 유효성 검사
-        if (!/^[a-z]/.test(projectName)) {
-            isValid = false;
-            newErrors.projectName = '프로젝트명은 영어 소문자로 시작해야 합니다.';
-        } else if (!/^[a-z0-9-]+$/.test(projectName)) {
-            isValid = false;
-            newErrors.projectName = '프로젝트명은 소문자, 숫자, "-"만 사용해야 합니다.';
-        } else if (projectName.length < 4 || projectName.length > 30) {
-            isValid = false;
-            newErrors.projectName = '프로젝트명은 4~30자리여야 합니다.';
-        }
-
-        // Primary 엔드포인트 유효성 검사
-        if (!primaryEndpoint.startsWith('az-')) {
-            isValid = false;
-            newErrors.primaryEndpoint = 'Primary 엔드포인트는 az-a 또는 az-b로 시작해야 합니다.';
-        } else {
-            const primaryParts = primaryEndpoint.split('.');
-            if (primaryParts.length < 6 || (primaryParts[0] !== 'az-a' && primaryParts[0] !== 'az-b')) {
-                isValid = false;
-                newErrors.primaryEndpoint = 'Primary 엔드포인트 형식이 유효하지 않습니다.';
-            } else if (!/^[0-9a-f]{32}$/.test(primaryParts[2])) {
-                isValid = false;
-                newErrors.primaryEndpoint = 'Primary 엔드포인트의 UUID 형식이 유효하지 않습니다.';
-            } else if (primaryParts.slice(3).join('.') !== 'mysql.managed-service.kr-central-2.kakaocloud.com') {
-                isValid = false;
-                newErrors.primaryEndpoint = 'Primary 엔드포인트는 "mysql.managed-service.kr-central-2.kakaocloud.com"로 끝나야 합니다.';
-            }
-        }
-
-        // Standby 엔드포인트 유효성 검사
-        if (!standbyEndpoint.startsWith('az-')) {
-            isValid = false;
-            newErrors.standbyEndpoint = 'Standby 엔드포인트는 az-a 또는 az-b로 시작해야 합니다.';
-        } else {
-            const standbyParts = standbyEndpoint.split('.');
-            if (standbyParts.length < 6 || (standbyParts[0] !== 'az-a' && standbyParts[0] !== 'az-b')) {
-                isValid = false;
-                newErrors.standbyEndpoint = 'Standby 엔드포인트 형식이 유효하지 않습니다.';
-            } else if (!/^[0-9a-f]{32}$/.test(standbyParts[2])) {
-                isValid = false;
-                newErrors.standbyEndpoint = 'Standby 엔드포인트의 UUID 형식이 유효하지 않습니다.';
-            } else if (standbyParts.slice(3).join('.') !== 'mysql.managed-service.kr-central-2.kakaocloud.com') {
-                isValid = false;
-                newErrors.standbyEndpoint = 'Standby 엔드포인트는 "mysql.managed-service.kr-central-2.kakaocloud.com"로 끝나야 합니다.';
-            }
-        }
-
-        // az-a와 az-b의 상호 검증
-        if (primaryEndpoint.startsWith('az-a') && !standbyEndpoint.startsWith('az-b')) {
-            isValid = false;
-            newErrors.standbyEndpoint = 'Primary 엔드포인트가 az-a로 시작하면 Standby 엔드포인트는 az-b로 시작해야 합니다.';
-        } else if (primaryEndpoint.startsWith('az-b') && !standbyEndpoint.startsWith('az-a')) {
-            isValid = false;
-            newErrors.standbyEndpoint = 'Primary 엔드포인트가 az-b로 시작하면 Standby 엔드포인트는 az-a로 시작해야 합니다.';
-        }
-
-        setErrors(newErrors);
-        return isValid;
-    };
-
     const generateScript = () => {
-        if (validateForm()) {
-            const newScript = `#!/bin/bash
+        const newScript = `#!/bin/bash
+
 echo "kakaocloud: 1.Starting environment variable setup"
 # 환경 변수 설정: 사용자는 이 부분에 자신의 환경에 맞는 값을 입력해야 합니다.
 command=$(cat <<EOF
@@ -288,25 +157,25 @@ export DOCKER_IMAGE_NAME='${dockerImageName}'
 export DOCKER_JAVA_VERSION='${dockerJavaVersion}'
 export JAVA_VERSION='17'
 export SPRING_BOOT_VERSION='3.1.0'
-export DB_EP1=$(echo -n "\\$INPUT_DB_EP1" | base64 -w 0)
-export DB_EP2=$(echo -n "\\$INPUT_DB_EP2" | base64 -w 0)
+export DB_EP1=\$(echo -n "\$INPUT_DB_EP1" | base64 -w 0)
+export DB_EP2=\$(echo -n "\$INPUT_DB_EP2" | base64 -w 0)
 EOF
 )
+
 eval "$command"
 echo "$command" >> /home/ubuntu/.bashrc
 echo "kakaocloud: Environment variable setup completed"
+
 echo "kakaocloud: 2.Checking the validity of the script download site"
 curl --output /dev/null --silent --head --fail "https://github.com/kakaocloud-edu/tutorial/raw/main/AdvancedCourse/src/script/script.sh" || { echo "kakaocloud: Script download site is not valid"; exit 1; }
 echo "kakaocloud: Script download site is valid"
+
 wget https://github.com/kakaocloud-edu/tutorial/raw/main/AdvancedCourse/src/script/script.sh
 chmod +x script.sh
 sudo -E ./script.sh`;
-            setScript(newScript);
-            navigator.clipboard.writeText(newScript);
-            alert('스크립트가 생성되고 클립보드에 복사되었습니다.');
-        } else {
-            alert('각 필드의 유효성을 체크해주세요.');
-        }
+        setScript(newScript);
+        navigator.clipboard.writeText(newScript);
+        alert('스크립트가 생성되고 클립보드에 복사되었습니다.');
     };
 
     const fetchProjects = async () => {
@@ -434,14 +303,12 @@ sudo -E ./script.sh`;
                     placeholder="직접 입력"
                     value={accessKey}
                     onChange={(e) => setAccessKey(e.target.value)}
-                    error={errors.accessKey}
                 />
                 <InputBox
                     label="2. 사용자 액세스 보안 키"
                     placeholder="직접 입력"
                     value={secretKey}
                     onChange={(e) => setSecretKey(e.target.value)}
-                    error={errors.secretKey}
                 />
             </GroupContainer>
             <GroupContainer>
@@ -454,7 +321,6 @@ sudo -E ./script.sh`;
                     onApiClick={() => handleApiButtonClick('fetchProjects', handleFetchProjectsAndClusters)}
                     isLoading={loadingButton === 'fetchProjects'}
                     disableAll={!!loadingButton}
-                    error={errors.projectName}
                 />
             </GroupContainer>
             <GroupContainer>
@@ -474,7 +340,6 @@ sudo -E ./script.sh`;
                     onApiClick={() => handleApiButtonClick('fetchClusterName', fetchKubeConfig, clusterName)}
                     isLoading={loadingButton === 'fetchClusterName'}
                     disableAll={!!loadingButton}
-                    error={errors.clusterName}
                 />
                 <InputBox
                     label="6. 클러스터의 API 엔드포인트"
@@ -485,7 +350,6 @@ sudo -E ./script.sh`;
                     onApiClick={() => handleApiButtonClick('fetchApiEndpoint', fetchKubeConfig, clusterName)}
                     isLoading={loadingButton === 'fetchApiEndpoint'}
                     disableAll={!!loadingButton}
-                    error={errors.apiEndpoint}
                 />
                 <InputBox
                     label="7. 클러스터의 certificate-authority-data"
@@ -496,7 +360,6 @@ sudo -E ./script.sh`;
                     onApiClick={() => handleApiButtonClick('fetchAuthData', fetchKubeConfig, clusterName)}
                     isLoading={loadingButton === 'fetchAuthData'}
                     disableAll={!!loadingButton}
-                    error={errors.authData}
                 />
             </GroupContainer>
             <GroupContainer>
@@ -516,7 +379,6 @@ sudo -E ./script.sh`;
                     onApiClick={() => handleApiButtonClick('fetchInstancePrimaryEndpoints', fetchInstanceEndpoints, instanceName)}
                     isLoading={loadingButton === 'fetchInstancePrimaryEndpoints'}
                     disableAll={!!loadingButton}
-                    error={errors.primaryEndpoint}
                 />
                 <InputBox
                     label="10. Standby의 엔드포인트"
@@ -527,7 +389,6 @@ sudo -E ./script.sh`;
                     onApiClick={() => handleApiButtonClick('fetchInstanceStandbyEndpoints', fetchInstanceEndpoints, instanceName)}
                     isLoading={loadingButton === 'fetchInstanceStandbyEndpoints'}
                     disableAll={!!loadingButton}
-                    error={errors.standbyEndpoint}
                 />
             </GroupContainer>
             <GroupContainer>
@@ -536,14 +397,12 @@ sudo -E ./script.sh`;
                     placeholder="직접 입력"
                     value={dockerImageName}
                     onChange={(e) => setDockerImageName(e.target.value)}
-                    error={errors.dockerImageName}
                 />
                 <InputBox
                     label="12. Docker Image Base Java Version"
                     placeholder="직접 입력"
                     value={dockerJavaVersion}
                     onChange={(e) => setDockerJavaVersion(e.target.value)}
-                    error={errors.dockerJavaVersion}
                 />
             </GroupContainer>
             <ScriptDisplay script={script} />
