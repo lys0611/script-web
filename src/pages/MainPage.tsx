@@ -1,3 +1,4 @@
+// src/pages/MainPage.tsx
 import React, { useEffect, useState } from 'react';
 import InputBox from '../components/InputBox';
 import ScriptDisplay from '../components/ScriptDisplay';
@@ -92,11 +93,11 @@ const MainPage: React.FC = () => {
     const [secretKey, setSecretKey] = useState('');
     const [email, setEmail] = useState('');
     const [projectName, setProjectName] = useState('');
-    const [clusterList, setClusterList] = useState<string[]>([]);
+    const [clusterList, setClusterList] = useState<string[]>(['k8s-cluster']);
     const [clusterName, setClusterName] = useState('');
     const [apiEndpoint, setApiEndpoint] = useState('');
     const [authData, setAuthData] = useState('');
-    const [instanceList, setInstanceList] = useState('');
+    const [instanceList, setInstanceList] = useState<string[]>(['database']);
     const [instanceName, setInstanceName] = useState('');
     const [primaryEndpoint, setPrimaryEndpoint] = useState('');
     const [standbyEndpoint, setStandbyEndpoint] = useState('');
@@ -333,7 +334,7 @@ sudo -E ./script.sh`;
 
             const clusterNames = response.data.items.map((item: any) => item.name);
 
-            setClusterList(clusterNames); // 배열로 설정
+            setClusterList(['k8s-cluster', ...clusterNames]); // 배열에 고정된 값 추가
 
         } catch (error) {
             console.error('API 호출 오류:', error);
@@ -349,7 +350,7 @@ sudo -E ./script.sh`;
                 access_key_secret: secretKey,
             });
             const instanceSetNames = response.data;  // 이미 배열 형태라고 가정
-            setInstanceList(instanceSetNames.join(', '));
+            setInstanceList(['database', ...instanceSetNames]);
 
         } catch (error) {
             console.error('API 호출 오류:', error);
@@ -416,7 +417,7 @@ sudo -E ./script.sh`;
         clusterName,
         apiEndpoint,
         authData,
-        instanceList,
+        instanceList: instanceList.join(', '),
         primaryEndpoint,
         standbyEndpoint,
         dockerImageName,
@@ -502,7 +503,7 @@ sudo -E ./script.sh`;
                 <SelectBox
                     label="8. 인스턴스 그룹 리스트"
                     value={instanceName}
-                    options={instanceList.split(', ')}
+                    options={instanceList}
                     onChange={handleInstanceNameChange}
                     disabled={loadingButton === 'fetchInstanceLists'}
                 />

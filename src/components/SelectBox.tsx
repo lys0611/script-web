@@ -60,14 +60,14 @@ const Select = styled.select<{ isPlaceholder: boolean }>`
     }
 `;
 
-const SelectBox: React.FC<SelectBoxProps> = ({ label, value, options, onChange }) => {
+const SelectBox: React.FC<SelectBoxProps> = ({ label, value, options, onChange, disabled }) => {
     const isPlaceholder = value === '';
 
     return (
         <Container>
             <Label>{label}</Label>
             <SelectWrapper>
-                <Select value={value} onChange={onChange} isPlaceholder={isPlaceholder}>
+                <Select value={value} onChange={onChange} isPlaceholder={isPlaceholder} disabled={disabled}>
                     <option value="" style={{ color: '#aaa' }}>
                         Select an option
                     </option>
